@@ -4,12 +4,11 @@
 using System.Data.SqlTypes;
 using System.Reflection;
 using System.Text.Json;
-//indexoutofrange 174,425,380,544,646
-//jumping/killing not working correctly
+//introduction/rules
 Console.WriteLine("Checkers \nYou may move any piece one move diagonally forward if there is not a piece in that spot. To kill an opponent's piece, you must move diagonally one jump over it. After killing a piece, you can continue to jump over and kill oponents pieces if desired. If you reach the opposite side of the board your piece becomes a king and you can move in any diagonal direction. The player who kills all of the opponents pieces first wins. Player 1’s pieces are “o”’s, and “*”’s when they become kings. Player 2’s pieces are “c”’s and “+”’s when they are kings.  \nPress any key to begin");
 Console.ReadKey(true);
 Console.Clear();
-
+//checkers board (where all the magic happens)
 string[,] Pieces= {{" ", "1", "2", "3", "4", "5", "6", "7", "8"},{"A", " ", "o", " ", "o", " ", "o", " ", "o"},{"B", "o", " ", "o", " ", "o", " ", "o", " "}, {"C", " ", " ", " ", " ", " ", " ", " ", " "},{"D", " ", " ", " ", " ", " ", " ", " ", " "},{"E", " ", " ", " ", " ", " ", " ", " ", " "},{"F", " ", " ", " ", " ", " ", " ", " ", " "},{"G", " ", "c", " ", "c", " ", "c", " ", "c"},{"H", "c", " ", "c", " ", "c", " ", "c", " "}};
 
 int Player=1;
@@ -17,7 +16,7 @@ int Player=1;
 
 
 
-
+//printing the array into a checkers board
 static void Print(ref string[,] Pieces)
 {
 for(int y=0;y<9;y++)
@@ -54,18 +53,17 @@ Console.Write(Pieces[y,x]);
 };
 };
 };
-
+//variables to determine if someone has won
 int win=0;
-
 int P1=0;
 int P2=0;
 
-
+//method that determines if there are any o's and c's left on the board, and if not, who won.
 static void Winner(ref string[,] Pieces, ref int win, int P1, int P2)
 {
-for(int y=1;y<7;y++)
+for(int y=1;y<9;y++)
 {
-for(int x=1;x<7;x++)
+for(int x=1;x<9;x++)
 {
 if(Pieces[y,x]=="o"||Pieces[y,x]=="*")
 P1++;
@@ -73,7 +71,7 @@ else if(Pieces[y,x]=="c"||Pieces[y,x]=="+")
 P2++;
 if(y==8&&Pieces[y,x]=="o")
 Pieces[y,x]="*";
-if(y==1&&Pieces[y,x]=="c")
+else if(y==1&&Pieces[y,x]=="c")
 Pieces[y,x]="+";
 
 };
@@ -89,15 +87,27 @@ win=1;
 
 };
 };
-
+//array that (will) contain the inputs (after being modified)
+//I knew I would have to write it a lot, so I simplified the name, SG stands for SimplifiedGood which just means that the coordinates are good to work with
+//I did this for other variables as well.
 int[] SG=new int[4];
 
+static void End(int win)
+{
+Console.Clear();
+if(win==1)
+Console.WriteLine("Player 1 wins!");
+else if(win==2)
+Console.WriteLine("Player 2 wins!");
+Console.ReadKey(true);
+}
 
 
 
-
+//A method that allows a player to kill multiple pieces at a time if they are in a row.
 static void Jump(ref string[,] Pieces,ref int[] SG, ref int Player, int win, int P1, int P2)
 {
+    Winner(ref Pieces, ref win, P1, P2);
     Console.Clear();
     Print(ref Pieces);
     Console.BackgroundColor=ConsoleColor.Black;
@@ -143,21 +153,29 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
   SG[2]=Convert.ToInt32(JS[0]);
   SG[3]=Convert.ToInt32(JS[1]);
    
-   
+   //allows player to stop jumping
     if(SG[2]==8&&SG[3]==8)
     {
         if(Player==1)
         {
             Player=2;
-            Ask(ref Pieces, ref SG, Player, win);
+            Winner(ref Pieces, ref win, P1, P2);
+            if(win!=0)
+            End(win);
+            else
+            Ask(ref Pieces, ref SG, Player, win, P1, P2);
         }
         else if(Player==2)
         {
             Player=1;
-            Ask(ref Pieces, ref SG, Player, win);
+            Winner(ref Pieces, ref win, P1, P2);
+            if(win!=0)
+            End(win);
+            else
+            Ask(ref Pieces, ref SG, Player, win, P1, P2);
         }
     }
-
+//"o" pieces moves
     if(Player==1)
     {
         if(Pieces[SG[0],SG[1]]=="o")
@@ -180,6 +198,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
     }
+    //"*" pieces moves
     else if(Pieces[SG[0],SG[1]]=="*")
     {
         if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="c"||Pieces[SG[2]-1,SG[3]-1]=="+"))
@@ -217,6 +236,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
     }
     }
     }
+    //"c" pieces moves
     else if(Player==2)
     {
         if(Pieces[SG[0],SG[1]]=="c")
@@ -238,6 +258,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
     }
+    //"+" pieces moves
     else if(Pieces[SG[0],SG[1]]=="+")
     {
         if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="o"||Pieces[SG[2]-1,SG[3]-1]=="*"))
@@ -275,27 +296,28 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
     }
     }
     }
-Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
 }
 
 
 
 
-
+//a method that takes the input of the user and turns it into workable numbers
 
 static void Ask(ref string[,] Pieces,ref int[] SG, int Player,int win, int P1, int P2)
 {
+    Winner(ref Pieces, ref win, P1, P2);
 Console.Clear();
 Print(ref Pieces);
 Console.BackgroundColor=ConsoleColor.Black;
+//instructions (because it's confusing when you first start)
 Console.WriteLine($"\nWrite the coordinates of the piece you want to move, then where to move it. Type a letter, then a number, place a comma in between with no spaces then press enter. For example: G,1 F,2\nPlayer {Player}:\n");
 
 string? Start=Console.ReadLine();
 string? End=Console.ReadLine();
 
 string[] SO=new string[4];
-string[] SS;
-string[] SE;
+string[] SS=new string[2];
+string[] SE=new string[2];
 try{
 SS=Start!.Split(",");
 SE=End!.Split(",");
@@ -371,6 +393,7 @@ catch(IndexOutOfRangeException)
 {
     Ask(ref Pieces, ref SG, Player, win, P1, P2);
 }
+//adding the new numbers to that important array. 
 SG[0]=Convert.ToInt32(SO[0]);
 SG[1]=Convert.ToInt32(SO[1]);
 SG[2]=Convert.ToInt32(SO[2]);
@@ -385,7 +408,7 @@ Move(ref Pieces, SG, ref Player, win, P1, P2);
 
 static void Move(ref string[,] Pieces, int[] SG, ref int Player, int win, int P1, int P2)
 {
-//moving pieces
+//"o" pieces move normal
 if(Player==1)
 {
 if(Pieces[SG[0],SG[1]]=="o")
@@ -399,7 +422,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -411,9 +434,9 @@ if(Pieces[SG[0],SG[1]]=="o")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
-   
+   //"o" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="c"||Pieces[SG[2]-1,SG[3]-1]=="+"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -432,6 +455,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
 }
+//"*" pieces move normally
 else if(Pieces[SG[0],SG[1]]=="*")
 {
       if(SG[1]+1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -443,7 +467,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -455,9 +479,9 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
-   
+   //"*" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="c"||Pieces[SG[2]-1,SG[3]-1]=="+"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -475,6 +499,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         Winner(ref Pieces, ref win, P1, P2);
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
+    //"*" normal
     else if(SG[1]-1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -484,7 +509,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -495,8 +520,9 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
+    //"*" kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="c"||Pieces[SG[2]+1,SG[3]+1]=="+"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -515,6 +541,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
     }
 }
 }
+//"c" pieces move normally
 else if(Player==2)
 {
 if(Pieces[SG[0],SG[1]]=="c")
@@ -528,7 +555,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -539,8 +566,9 @@ if(Pieces[SG[0],SG[1]]=="c")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
+    //"c" pieces kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="o"||Pieces[SG[2]+1,SG[3]+1]=="*"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -558,6 +586,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
 }
+//"+" pieces move normally
 else if(Pieces[SG[0],SG[1]]=="+")
 {
       if(SG[1]+1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -569,7 +598,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -583,7 +612,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Winner(ref Pieces, ref win, P1, P2);
         Ask(ref Pieces,ref SG, Player, win, P1, P2);
     }
-   
+   //"+" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="o"||Pieces[SG[2]-1,SG[3]-1]=="*"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -601,6 +630,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Winner(ref Pieces, ref win, P1, P2);
         Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
     }
+    //"+" normal
     else if(SG[1]-1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -610,7 +640,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -621,8 +651,9 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2);
     }
+    //"+" kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="o"||Pieces[SG[2]+1,SG[3]+1]=="*"))
     {
         Pieces[SG[0],SG[1]]=" ";
@@ -641,17 +672,14 @@ else if(Pieces[SG[0],SG[1]]=="+")
     }
 }
 }
-Ask(ref Pieces,ref SG, Player, win, P1, P2);
 }
 
 //Actual code
+//determines who is the winner, when it whould stop looping etc.
+//technically this doesn't really do anything but I needed a while loop
 while(win==0)
 {
 Ask(ref Pieces,ref SG, Player, win, P1, P2);
 Move(ref Pieces, SG, ref Player, win, P1, P2);
 }
-Console.Clear();
-if(win==1)
-Console.WriteLine("Player 1 wins!");
-else if(win==2)
-Console.WriteLine("Player 2 wins!");
+End(win);
