@@ -1,0 +1,14 @@
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).GeneratedMSBuildEditorConfig.editorconfig
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).AssemblyInfoInputs.cache
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).AssemblyInfo.cs
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).csproj.CoreCompileInputs.cache
+/Users/business/Desktop/my-code-dir/Final (Checkers)/bin/Debug/net7.0/Final (Checkers)
+/Users/business/Desktop/my-code-dir/Final (Checkers)/bin/Debug/net7.0/Final (Checkers).deps.json
+/Users/business/Desktop/my-code-dir/Final (Checkers)/bin/Debug/net7.0/Final (Checkers).runtimeconfig.json
+/Users/business/Desktop/my-code-dir/Final (Checkers)/bin/Debug/net7.0/Final (Checkers).dll
+/Users/business/Desktop/my-code-dir/Final (Checkers)/bin/Debug/net7.0/Final (Checkers).pdb
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).dll
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/refint/Final (Checkers).dll
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).pdb
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/Final (Checkers).genruntimeconfig.cache
+/Users/business/Desktop/my-code-dir/Final (Checkers)/obj/Debug/net7.0/ref/Final (Checkers).dll
