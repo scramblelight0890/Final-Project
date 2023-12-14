@@ -2,6 +2,7 @@
 //Acacia Dodge, Chess, Oct 16
 
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 //introduction/rules
@@ -12,7 +13,7 @@ Console.Clear();
 string[,] Pieces= {{" ", "1", "2", "3", "4", "5", "6", "7", "8"},{"A", " ", "o", " ", "o", " ", "o", " ", "o"},{"B", "o", " ", "o", " ", "o", " ", "o", " "}, {"C", " ", " ", " ", " ", " ", " ", " ", " "},{"D", " ", " ", " ", " ", " ", " ", " ", " "},{"E", " ", " ", " ", " ", " ", " ", " ", " "},{"F", " ", " ", " ", " ", " ", " ", " ", " "},{"G", " ", "c", " ", "c", " ", "c", " ", "c"},{"H", "c", " ", "c", " ", "c", " ", "c", " "}};
 
 int Player=1;
-
+bool stop=false;
 
 
 
@@ -92,9 +93,10 @@ win=1;
 //I did this for other variables as well.
 int[] SG=new int[4];
 
-static void End(int win)
+static void End(int win, string[,]Pieces)
 {
-Console.Clear();
+    Console.Clear();
+    Print(ref Pieces);
 if(win==1)
 Console.WriteLine("Player 1 wins!");
 else if(win==2)
@@ -105,7 +107,7 @@ Console.ReadKey(true);
 
 
 //A method that allows a player to kill multiple pieces at a time if they are in a row.
-static void Jump(ref string[,] Pieces,ref int[] SG, ref int Player, int win, int P1, int P2)
+static void Jump(ref string[,] Pieces,ref int[] SG, ref int Player, int win, int P1, int P2, bool stop)
 {
     Winner(ref Pieces, ref win, P1, P2);
     Console.Clear();
@@ -120,7 +122,7 @@ JS=je!.Split(",");
 }
 catch(Exception)
 {
-    Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+    Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
 }
 if (JS[1]=="1"||JS[1]=="2"||JS[1]=="3"||JS[1]=="4"||JS[1]=="5"||JS[1]=="6"||JS[1]=="7"||JS[1]=="8"&&JS[0]=="A"||JS[0]=="B"||JS[0]=="C"||JS[0]=="D"||JS[0]=="E"||JS[0]=="F"||JS[0]=="G"||JS[0]=="H")
    {
@@ -141,12 +143,12 @@ JS[0]="7";
 else if (JS[0]=="H")
 JS[0]="8";
 else
-Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
+Jump(ref Pieces,ref SG,ref Player, win, P1, P2, stop);
 
    }
   else
   {
-  Jump(ref Pieces,ref SG, ref Player, win, P1, P2); 
+  Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop); 
   }
   SG[0]=J[0];
   SG[1]=J[1];
@@ -160,19 +162,13 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         {
             Player=2;
             Winner(ref Pieces, ref win, P1, P2);
-            if(win!=0)
-            End(win);
-            else
-            Ask(ref Pieces, ref SG, Player, win, P1, P2);
+            Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
         }
         else if(Player==2)
         {
             Player=1;
             Winner(ref Pieces, ref win, P1, P2);
-            if(win!=0)
-            End(win);
-            else
-            Ask(ref Pieces, ref SG, Player, win, P1, P2);
+            Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
         }
     }
 //"o" pieces moves
@@ -186,7 +182,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="o";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
 
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="c"||Pieces[SG[2]-1,SG[3]+1]=="+"))
@@ -195,7 +191,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="o";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     }
     //"*" pieces moves
@@ -207,7 +203,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
 
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="c"||Pieces[SG[2]-1,SG[3]+1]=="+"))
@@ -216,7 +212,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="c"||Pieces[SG[2]+1,SG[3]+1]=="+"))
     {
@@ -224,7 +220,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="c"||Pieces[SG[2]+1,SG[3]-1]=="+"))
     {
@@ -232,7 +228,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     }
     }
@@ -247,7 +243,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="c";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="o"||Pieces[SG[2]+1,SG[3]-1]=="*"))
     {
@@ -255,7 +251,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="c";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     }
     //"+" pieces moves
@@ -267,7 +263,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
 
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="o"||Pieces[SG[2]-1,SG[3]+1]=="*"))
@@ -276,7 +272,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]+1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="o"||Pieces[SG[2]+1,SG[3]+1]=="*"))
     {
@@ -284,7 +280,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="o"||Pieces[SG[2]+1,SG[3]-1]=="*"))
     {
@@ -292,7 +288,7 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     }
     }
@@ -303,9 +299,14 @@ Jump(ref Pieces,ref SG,ref Player, win, P1, P2);
 
 //a method that takes the input of the user and turns it into workable numbers
 
-static void Ask(ref string[,] Pieces,ref int[] SG, int Player,int win, int P1, int P2)
+static bool Ask(ref string[,] Pieces,ref int[] SG, int Player,int win, int P1, int P2, ref bool stop)
 {
     Winner(ref Pieces, ref win, P1, P2);
+    if(win!=0)
+    {
+        stop=true;
+        return stop;
+    }
 Console.Clear();
 Print(ref Pieces);
 Console.BackgroundColor=ConsoleColor.Black;
@@ -324,7 +325,7 @@ SE=End!.Split(",");
 }
 catch(Exception)
 {
-    Ask(ref Pieces, ref SG, Player, win, P1, P2);
+    Ask(ref Pieces, ref SG, Player, win, P1, P2,ref stop);
 }
 
 
@@ -355,7 +356,7 @@ SO[0]="7";
 else if (SO[0]=="H")
 SO[0]="8";
 else
-Ask(ref Pieces,ref SG, Player, win, P1, P2);
+Ask(ref Pieces,ref SG, Player, win, P1, P2,ref stop);
 
 if (SO[2]=="A")
 SO[2]="1";
@@ -374,31 +375,33 @@ SO[2]="7";
 else if (SO[2]=="H")
 SO[2]="8";
 else
-Ask(ref Pieces,ref SG, Player, win, P1, P2);
+Ask(ref Pieces,ref SG, Player, win, P1, P2,ref stop);
 
 
 }
 
 else
 {
-    Ask(ref Pieces,ref SG, Player, win, P1, P2);
+    Ask(ref Pieces,ref SG, Player, win, P1, P2,ref stop);
 }
 }
 else
 {
-    Ask(ref Pieces,ref SG, Player, win, P1, P2);
+    Ask(ref Pieces,ref SG, Player, win, P1, P2,ref stop);
 }
 }
 catch(IndexOutOfRangeException)
 {
-    Ask(ref Pieces, ref SG, Player, win, P1, P2);
+    Ask(ref Pieces, ref SG, Player, win, P1, P2,ref stop);
 }
 //adding the new numbers to that important array. 
 SG[0]=Convert.ToInt32(SO[0]);
 SG[1]=Convert.ToInt32(SO[1]);
 SG[2]=Convert.ToInt32(SO[2]);
 SG[3]=Convert.ToInt32(SO[3]);
-Move(ref Pieces, SG, ref Player, win, P1, P2);
+stop=false;
+Move(ref Pieces, SG, ref Player, win, P1, P2, stop);
+return stop;
 }
 
 
@@ -406,7 +409,7 @@ Move(ref Pieces, SG, ref Player, win, P1, P2);
 
 
 
-static void Move(ref string[,] Pieces, int[] SG, ref int Player, int win, int P1, int P2)
+static void Move(ref string[,] Pieces, int[] SG, ref int Player, int win, int P1, int P2,bool stop)
 {
 //"o" pieces move normal
 if(Player==1)
@@ -422,7 +425,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -434,7 +437,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
    //"o" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="c"||Pieces[SG[2]-1,SG[3]-1]=="+"))
@@ -443,7 +446,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="o";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
 
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="c"||Pieces[SG[2]-1,SG[3]+1]=="+"))
@@ -452,7 +455,7 @@ if(Pieces[SG[0],SG[1]]=="o")
         Pieces[SG[0]+1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="o";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
 }
 //"*" pieces move normally
@@ -467,7 +470,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -479,7 +482,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
    //"*" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="c"||Pieces[SG[2]-1,SG[3]-1]=="+"))
@@ -488,7 +491,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
 
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="c"||Pieces[SG[2]+1,SG[3]-1]=="+"))
@@ -497,7 +500,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2,stop);
     }
     //"*" normal
     else if(SG[1]-1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -509,7 +512,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -520,7 +523,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
     //"*" kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="c"||Pieces[SG[2]+1,SG[3]+1]=="+"))
@@ -529,7 +532,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="c"||Pieces[SG[2]-1,SG[3]+1]=="+"))
     {
@@ -537,7 +540,7 @@ else if(Pieces[SG[0],SG[1]]=="*")
         Pieces[SG[0]+1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="*";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
 }
 }
@@ -555,7 +558,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -566,7 +569,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2,ref stop);
     }
     //"c" pieces kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="o"||Pieces[SG[2]+1,SG[3]+1]=="*"))
@@ -575,7 +578,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="c";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="o"||Pieces[SG[2]+1,SG[3]-1]=="*"))
     {
@@ -583,7 +586,7 @@ if(Pieces[SG[0],SG[1]]=="c")
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="c";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
 }
 //"+" pieces move normally
@@ -598,7 +601,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
 
     }
     else if(SG[1]-1==SG[3]&&SG[0]+1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -610,7 +613,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces,ref SG, Player, win, P1, P2);
+        Ask(ref Pieces,ref SG, Player, win, P1, P2, ref stop);
     }
    //"+" pieces kill
     else if(SG[1]+2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]-1]=="o"||Pieces[SG[2]-1,SG[3]-1]=="*"))
@@ -619,7 +622,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Pieces[SG[0]+1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
 
     }
     else if(SG[1]+2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]-1]=="o"||Pieces[SG[2]+1,SG[3]-1]=="*"))
@@ -628,7 +631,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Pieces[SG[0]-1,SG[1]+1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     //"+" normal
     else if(SG[1]-1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
@@ -640,7 +643,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2,ref stop);
     }
     else if(SG[1]+1==SG[3]&&SG[0]-1==SG[2]&&Pieces[SG[2],SG[3]]==" ")
     {
@@ -651,7 +654,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         else if(Player==2)
         Player=1;
         Winner(ref Pieces, ref win, P1, P2);
-        Ask(ref Pieces, ref SG, Player, win, P1, P2);
+        Ask(ref Pieces, ref SG, Player, win, P1, P2, ref stop);
     }
     //"+" kill
     else if(SG[1]-2==SG[3]&&SG[0]-2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]+1,SG[3]+1]=="o"||Pieces[SG[2]+1,SG[3]+1]=="*"))
@@ -660,7 +663,7 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Pieces[SG[0]-1,SG[1]-1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
     else if(SG[1]-2==SG[3]&&SG[0]+2==SG[2]&&Pieces[SG[2],SG[3]]==" "&&(Pieces[SG[2]-1,SG[3]+1]=="o"||Pieces[SG[2]-1,SG[3]+1]=="*"))
     {
@@ -668,18 +671,20 @@ else if(Pieces[SG[0],SG[1]]=="+")
         Pieces[SG[2]+1,SG[3]-1]=" ";
         Pieces[SG[2],SG[3]]="+";
         Winner(ref Pieces, ref win, P1, P2);
-        Jump(ref Pieces,ref SG, ref Player, win, P1, P2);
+        Jump(ref Pieces,ref SG, ref Player, win, P1, P2, stop);
     }
 }
 }
 }
-
+//A debug 
+Debug.Assert(Ask(ref Pieces,ref SG, Player, 1, P1, P2, ref stop)==true);
+Debug.Assert(Ask(ref Pieces,ref SG, Player, 0, P1, P2, ref stop)==false);
 //Actual code
 //determines who is the winner, when it whould stop looping etc.
 //technically this doesn't really do anything but I needed a while loop
-while(win==0)
+while(stop==false)
 {
-Ask(ref Pieces,ref SG, Player, win, P1, P2);
-Move(ref Pieces, SG, ref Player, win, P1, P2);
+Ask(ref Pieces,ref SG, Player, win, P1, P2, ref stop);
 }
-End(win);
+End(win, Pieces);
+

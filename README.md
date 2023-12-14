@@ -15,7 +15,7 @@
 
 3. Comments--yes
 
-4. Tests--no
+4. Tests--yes(kind of)
 
 5. Implementation
 
@@ -31,4 +31,4 @@
 -10. I have a while loop to verify if someone has won.
 -11. Two for loops allow me to print the checkers board.
 -16. The user has to input what piece they want to move, and where they wish to move it.
--
+-This isn't on there, but I have catching exceptions if that counts for #10
